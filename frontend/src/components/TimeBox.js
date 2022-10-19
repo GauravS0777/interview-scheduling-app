@@ -7,11 +7,10 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 
-export default function TimeBox() {
-  const [value, setValue] = React.useState(dayjs('2022-08-18T10:00:00'));
+export default function TimeBox(props) {
 
   const handleChange = (newValue) => {
-    setValue(newValue);
+    props.setValue(newValue);
   };
 
   return (
@@ -25,13 +24,13 @@ export default function TimeBox() {
         <DesktopDatePicker
           label="Date"
           inputFormat="MM/DD/YYYY"
-          value={value}
+          value={props.value}
           onChange={handleChange}
           renderInput={(params) => <TextField {...params} />}
         />
         <TimePicker
           label="Time"
-          value={value}
+          value={props.value}
           onChange={handleChange}
           renderInput={(params) => <TextField {...params} />}
         />
