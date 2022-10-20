@@ -65,8 +65,9 @@ const forceUpdate = useCallback(() => updateState({}), []);
             <Button 
             variant="contained"
             sx={{textTransform: "none"}}
+            disabled={true}
             >
-              Pending
+              <strong>Pending</strong>
             </Button>
 
             <Button 
