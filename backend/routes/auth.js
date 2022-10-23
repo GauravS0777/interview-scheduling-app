@@ -22,14 +22,14 @@ router.post("/login", async (req, res) => {
     if(user.password !== password) return res.status(401).json({ error: "Invalid password." });
     
     // create access and refresh tokens
-    const accessToken = jwt.sign({ _id: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });  // m => minutes, h => hours
-    const refreshToken = jwt.sign({ _id: user._id }, process.env.REFRESH_TOKEN_SECRET);
+    const accessToken = jwt.sign({ _id: user._id, isTA: user.isTA }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });  // m => minutes, h => hours
+    const refreshToken = jwt.sign({ _id: user._id, isTA: user.isTA }, process.env.REFRESH_TOKEN_SECRET);
     
     // create token
     const tokenCollection = db.collection("tokens"); 
     try{
         await tokenCollection.insertOne({ token: refreshToken });
-        res.status(200).json({ accessToken: accessToken, refreshToken: refreshToken });
+        res.status(200).json({ accessToken: accessToken, refreshToken: refreshToken, username: user.username, isTA: user.isTA });
     }catch(err){
         return res.json(err);
     }

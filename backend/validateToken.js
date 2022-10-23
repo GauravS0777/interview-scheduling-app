@@ -3,12 +3,12 @@ const { getDB } = require("./connection");
 
 // middleware
 const validateAccessToken = (req, res, next) => {
-    const accessToken = req.header("access-token");
+    const accessToken = req.header("accessToken");
     if(!accessToken) return res.status(401).json({ error: "Access denied." });
     // validate token
     try{
-        const { _id } = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
-        req.user = { _id: _id };
+        const { _id, isTA } = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+        req.user = { _id: _id, isTA: isTA };
         next();
     }catch(err){
         return res.status(401).json({ error: "Access denied." });
@@ -30,8 +30,8 @@ const validateRefreshToken = async (req, res, next) => {
     }
     // extract _id of the user
     try{
-        const { _id } = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-        req.user = { _id: _id };
+        const { _id, isTA } = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        req.user = { _id: _id, isTA: isTA };
     }catch(err){
         return res.json(err);
     }

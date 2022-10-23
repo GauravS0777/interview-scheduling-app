@@ -6,17 +6,32 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import dayjs from 'dayjs';
 import * as React from 'react';
-
+import { useNavigate } from "react-router-dom";
 
 export const TalentAcquisition = () => {
 
     const [value, setValue] = React.useState(dayjs('2022-08-18T10:00:00'));
     const [interviewers, setInterviewers] = useState([]);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if(!localStorage.getItem("accessToken")){
+            navigate("/");
+        }
+    }, [])
 
     const fetchInterviewersList = async () => {
-        const list = await axios.get("http://localhost:8000/interviewersList");
+        try{
+            const list = await axios.get("http://localhost:8000/interviewersList", {
+                headers: {
+                    "accessToken": localStorage.getItem("accessToken")
+                }
+            });
 
-        setInterviewers(list.data.data);
+            setInterviewers(list.data.data);
+        }catch(error){
+            console.log(error);
+        }
     }
 
     useEffect(() => {

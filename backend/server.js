@@ -19,13 +19,14 @@ app.get("/", (req, res) => {
     return res.send("Hello world!");
 });
 
-app.get("/interviewersList", async (req, res) => {
+app.get("/interviewersList", validateAccessToken, async (req, res) => {
     const db = getDB();
-    const collection = db.collection("interviewers");
-    let list = await collection.find({}).toArray();
+    const collection = db.collection("users");
+    let list = await collection.find({isTA: false}).toArray();
 
     const reqCollection = db.collection("requests");
-    const temp = await reqCollection.distinct("interviewerID");
+
+    const temp = await reqCollection.distinct("interviewerID", {"taID": req.user._id});
 
     list = list.map((value) => {
         if(temp.includes(value._id.toString())){
@@ -43,29 +44,40 @@ app.get("/interviewersList", async (req, res) => {
     res.status(200).json({"data": list});
 })
 
-app.post("/sendRequest", async (req, res) => {
+app.post("/sendRequest", validateAccessToken, async (req, res) => {
     // console.log(req.body);
 
     const db = getDB();
     const collection = db.collection("requests");
-    await collection.insert(req.body);
+
+    const { interviewerID, time } = req.body;
+    const { _id } = req.user;
+
+    await collection.insert({
+        "taID": _id,
+        "interviewerID": interviewerID,
+        "time": time
+    });
 
     res.status(200).json({});
 })
 
 
-app.post("/cancelRequest", async (req, res) => {
+app.post("/cancelRequest", validateAccessToken, async (req, res) => {
     // console.log(req.body);
 
     const db = getDB();
     const collection = db.collection("requests");
-    await collection.deleteOne(req.body);
+    const {interviewerID} = req.body;
+    const {_id} = req.user;
+    await collection.deleteOne({"interviewerID": interviewerID, "taID": _id});
 
     res.status(200).json({});
 })
 
 
 app.get("/getUsername", validateAccessToken, async (req, res) => {
+    console.log(req.user);
     const db = getDB();
     const collection = db.collection("users");
     const ob = await collection.findOne({_id: ObjectId(req.user._id)});

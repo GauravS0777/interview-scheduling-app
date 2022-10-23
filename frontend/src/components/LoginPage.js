@@ -1,7 +1,44 @@
-import { TextField, FormLabel, RadioGroup, FormControlLabel, Radio, Button, Typography } from "@mui/material"
+import { TextField, Button, Typography } from "@mui/material"
+import axios from "axios"
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom";
 
 
 export default function LoginPage() {
+
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const navigate = useNavigate();
+    const [errorMsg, setErrorMsg] = useState("");
+
+    useEffect(() => {
+        if(localStorage.getItem("accessToken")){
+            navigate("/ta");
+        }
+    }, [])
+
+    const loginClicked = async () => {
+        try{
+            const response = await axios.post("http://localhost:8000/api/user/login", {
+                "username": username,
+                "password": password
+            });
+
+            const data = response.data;
+
+            localStorage.setItem("username", data.username);
+            localStorage.setItem("isTA", data.isTA);
+            localStorage.setItem("accessToken", data.accessToken);
+            localStorage.setItem("refreshToke", data.refreshToken);
+
+            if(data.isTA){
+                navigate("/ta");
+            }
+        }catch(error){
+            console.log(error);
+            setErrorMsg("Invalid Credentials!")
+        }
+    }
 
     return (<>
         <div
@@ -26,34 +63,37 @@ export default function LoginPage() {
                 <Typography
                 align="center"
                 variant="h5"
-                sx={{margin: "10px 0 20px 0"}}
+                sx={{margin: "10px 0 15px 0"}}
                 >
                     Login Page
                 </Typography>
 
-                <TextField variant="outlined" label="username" sx={{margin: "10px 0"}}/>
-                <TextField variant="outlined" label="password" type="password" sx={{margin: "10px 0"}}/>
+                {
+                    errorMsg !== "" &&
+                    <Typography
+                    variant="h6"
+                    color="red"
+                    align="center"
+                    sx={{margin: "5px 0"}}
+                    >
+                        {errorMsg}
+                    </Typography>
+                }
 
-                <FormLabel id="demo-radio-buttons-group-label"
-                sx={{
-                    marginTop: "20px",
-                    display: "block"
-                }}
-                >Position</FormLabel>
-                <RadioGroup
-                    aria-labelledby="demo-radio-buttons-group-label"
-                    defaultValue="Talent Acqusition"
-                    name="radio-buttons-group"
-                >
-                    <FormControlLabel value="Talent Acqusition" control={<Radio />} label="Talent Acqusition" />
-                    <FormControlLabel value="Interviewer" control={<Radio />} label="Interviewer" />
-                </RadioGroup>
+                <TextField variant="outlined" label="username" 
+                value={username} onChange={(e) => {setUsername(e.target.value)}}  
+                sx={{margin: "10px 0"}}/>
+                
+                <TextField variant="outlined" label="password" 
+                value={password} onChange={(e) => {setPassword(e.target.value)}} 
+                type="password" sx={{margin: "10px 0"}}/>
 
                 <Button
                 variant="contained"
                 sx={{
                     margin: "20px 0"
                 }}
+                onClick={loginClicked}
                 >
                     Login
                 </Button>

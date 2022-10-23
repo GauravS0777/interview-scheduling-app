@@ -22,7 +22,11 @@ const forceUpdate = useCallback(() => updateState({}), []);
     }
 
     try{
-      await axios.post("http://localhost:8000/sendRequest", data);
+      await axios.post("http://localhost:8000/sendRequest", data, {
+        headers: {
+        "accessToken": localStorage.getItem("accessToken")
+        }
+      });
       props.data.busy = true;
       forceUpdate();
 
@@ -37,7 +41,11 @@ const forceUpdate = useCallback(() => updateState({}), []);
     }
 
     try{
-      await axios.post("http://localhost:8000/cancelRequest", data);
+      await axios.post("http://localhost:8000/cancelRequest", data, {
+        headers: {
+        "accessToken": localStorage.getItem("accessToken")
+        }
+      });
       props.data.busy = false;
       forceUpdate();
 
