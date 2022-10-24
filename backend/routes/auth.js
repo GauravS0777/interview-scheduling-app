@@ -25,14 +25,16 @@ router.post("/login", async (req, res) => {
     const accessToken = jwt.sign({ _id: user._id, isTA: user.isTA }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });  // m => minutes, h => hours
     const refreshToken = jwt.sign({ _id: user._id, isTA: user.isTA }, process.env.REFRESH_TOKEN_SECRET);
     
-    // create token
-    const tokenCollection = db.collection("tokens"); 
-    try{
-        await tokenCollection.insertOne({ token: refreshToken });
-        res.status(200).json({ accessToken: accessToken, refreshToken: refreshToken, username: user.username, isTA: user.isTA });
-    }catch(err){
-        return res.json(err);
-    }
+    return res.status(200).json({ accessToken: accessToken, refreshToken: refreshToken, username: user.username, isTA: user.isTA });
+
+    // // create token
+    // const tokenCollection = db.collection("tokens"); 
+    // try{
+    //     await tokenCollection.insertOne({ token: refreshToken });
+    //     res.status(200).json({ accessToken: accessToken, refreshToken: refreshToken, username: user.username, isTA: user.isTA });
+    // }catch(err){
+    //     return res.json(err);
+    // }
 });
 
 module.exports = router;

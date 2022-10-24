@@ -20,6 +20,10 @@ app.get("/", (req, res) => {
 });
 
 app.get("/interviewersList", validateAccessToken, async (req, res) => {
+    if(!req.user.isTA){
+        res.status(401).json({});
+    }
+    
     const db = getDB();
     const collection = db.collection("users");
     let list = await collection.find({isTA: false}).toArray();

@@ -13,7 +13,7 @@ export default function InterviewerCard(props) {
   console.log(props);
 
   const [, updateState] = useState();
-const forceUpdate = useCallback(() => updateState({}), []);
+  const forceUpdate = useCallback(() => updateState({}), []);
 
   const sendInterviewRequest = async () => {
     const data = {

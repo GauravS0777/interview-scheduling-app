@@ -13,7 +13,13 @@ export default function LoginPage() {
 
     useEffect(() => {
         if(localStorage.getItem("accessToken")){
-            navigate("/ta");
+            const isTA = localStorage.getItem("isTA") === "true";
+            console.log(isTA);
+            if(isTA){
+                navigate("/ta");
+            }else{
+                navigate("/in");
+            }
         }
     }, [])
 
@@ -33,6 +39,8 @@ export default function LoginPage() {
 
             if(data.isTA){
                 navigate("/ta");
+            }else{
+                navigate("/in");
             }
         }catch(error){
             console.log(error);
