@@ -1,10 +1,14 @@
 import {Button} from "@mui/material"
+import { useNavigate } from "react-router-dom";
 
 export default function LogoutBtn (props){
 
+    const navigate = useNavigate();
+
     const logoutClicked = () => {
         localStorage.clear();
-        props.forceUpdate();
+        // props.forceUpdate();
+        navigate("/");
     }
 
     return(<>

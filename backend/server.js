@@ -51,6 +51,10 @@ app.get("/interviewersList", validateAccessToken, async (req, res) => {
 app.post("/sendRequest", validateAccessToken, async (req, res) => {
     // console.log(req.body);
 
+    if(!req.user.isTA){
+        res.status(401).json({});
+    }
+
     const db = getDB();
     const collection = db.collection("requests");
 
@@ -70,6 +74,10 @@ app.post("/sendRequest", validateAccessToken, async (req, res) => {
 app.post("/cancelRequest", validateAccessToken, async (req, res) => {
     // console.log(req.body);
 
+    if(!req.user.isTA){
+        res.status(401).json({});
+    }
+
     const db = getDB();
     const collection = db.collection("requests");
     const {interviewerID} = req.body;
@@ -78,6 +86,21 @@ app.post("/cancelRequest", validateAccessToken, async (req, res) => {
 
     res.status(200).json({});
 })
+
+
+
+app.get("/getRequests", validateAccessToken, async (req, res) => {
+    if(req.user.isTA){
+        return res.status(401).json({});
+    }
+
+    const db = getDB();
+    const collection = db.collection("requests");
+    const requests = await collection.find({"interviewerID": req.user._id}).toArray();
+    return res.status(200).json({"data": requests});    
+})
+
+
 
 
 app.get("/getUsername", validateAccessToken, async (req, res) => {
