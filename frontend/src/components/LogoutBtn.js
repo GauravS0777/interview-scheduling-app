@@ -7,8 +7,8 @@ export default function LogoutBtn (props){
 
     const logoutClicked = () => {
         localStorage.clear();
-        // props.forceUpdate();
-        navigate("/");
+        props.forceUpdate();
+        // navigate("/");
     }
 
     return(<>

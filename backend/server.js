@@ -13,6 +13,15 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
+
+const getUserDetails = async (_id) => {
+    const db = getDB();
+    const collection = db.collection("users");
+    const ob = await collection.findOne({_id: ObjectId(_id)});
+    return ob;
+}
+
+
 app.use("/api/user", authRouter);
 
 app.get("/", (req, res) => {
@@ -26,7 +35,7 @@ app.get("/interviewersList", validateAccessToken, async (req, res) => {
     
     const db = getDB();
     const collection = db.collection("users");
-    let list = await collection.find({isTA: false}).toArray();
+    let list = await collection.find({isTA: false}).project({name: 1}).toArray();
 
     const reqCollection = db.collection("requests");
 
@@ -42,7 +51,7 @@ app.get("/interviewersList", validateAccessToken, async (req, res) => {
         return value
     })
 
-    console.log(list)
+    console.log("hey", list)
 
     // console.log(list);
     res.status(200).json({"data": list});
@@ -101,14 +110,92 @@ app.get("/getRequests", validateAccessToken, async (req, res) => {
 })
 
 
+app.get("/fetchInterviews", validateAccessToken, async (req, res) => {
+    if(req.user.isTA){
+        return res.status(401).json({});
+    }
+
+    const db = getDB();
+    const collection = db.collection("accepted");
+    const interviews = await collection.find({"interviewerID": req.user._id}).toArray();
+    console.log(req.user._id, interviews);
+    return res.status(200).json({"data": interviews});    
+})
+
+
+app.get("/acceptedInterviews", validateAccessToken, async (req, res) => {
+    if(!req.user.isTA){
+        return res.status(401).json({});
+    }
+
+    const db = getDB();
+    const collection = db.collection("accepted");
+    let interviews = await collection.find({"taID": req.user._id}).toArray();
+    interviews = await Promise.all(interviews.map(async (value) => {
+        const ob = await getUserDetails(value.interviewerID);
+        value.interviewerName = ob.name;
+        //console.log(value);
+        return value
+    }));
+
+    console.log(interviews);
+
+    return res.status(200).json({"data": interviews});    
+})
+
+
+
+app.post("/acceptRequest", validateAccessToken, async (req, res) => {
+    if(req.user.isTA){
+        return res.status(401).json({});
+    }
+
+    const { _id, interviewerID, taID, time } = req.body;
+    
+    const db = getDB();
+    const collection = db.collection("requests");
+    
+    try{
+        await collection.deleteOne({"_id": ObjectId(_id)}).toArray();
+    }catch(error){
+        console.log(error);
+    }
+
+    const collection2 = db.collection("accepted");
+    try{
+        await collection2.insertOne({"interviewerID": interviewerID, "taID": taID, "time": time});
+    }catch(error){
+        console.log(error);
+    }
+    
+    return res.status(200).json({message: "success"}); 
+})
+
+
+app.post("/rejectRequest", validateAccessToken, async (req, res) => {
+    if(req.user.isTA){
+        return res.status(401).json({});
+    }
+
+    const { _id, interviewerID, taID, time } = req.body;
+    
+    const db = getDB();
+    const collection = db.collection("requests");
+    
+    try{
+        await collection.deleteOne({"_id": ObjectId(_id)}).toArray();
+    }catch(error){
+        console.log(error);
+    }
+    
+    return res.status(200).json({message: "success"}); 
+})
+
 
 
 app.get("/getUsername", validateAccessToken, async (req, res) => {
     console.log(req.user);
-    const db = getDB();
-    const collection = db.collection("users");
-    const ob = await collection.findOne({_id: ObjectId(req.user._id)});
-
+    const ob = await getUserDetails(req.user._id);
     res.status(200).json(ob);
 })
 
