@@ -59,6 +59,7 @@ export const Interviewer = () => {
     }
 
     useEffect(() => {
+        console.log("hey how are you")
         fetchRequests();
         fetchInterviews();
     }, [state])
@@ -101,7 +102,7 @@ export const Interviewer = () => {
 
         {
             interviewList.map((value, idx) => {
-                return <InterviewCard data={value} key={idx} />
+                return <InterviewCard data={value} key={idx} forceUpdate={forceUpdate}/>
             })
         }
     </>);

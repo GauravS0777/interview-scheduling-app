@@ -183,11 +183,27 @@ app.post("/rejectRequest", validateAccessToken, async (req, res) => {
     const collection = db.collection("requests");
     
     try{
-        await collection.deleteOne({"_id": ObjectId(_id)}).toArray();
+        await collection.deleteOne({"_id": ObjectId(_id)});
     }catch(error){
         console.log(error);
     }
     
+    return res.status(200).json({message: "success"}); 
+})
+
+
+
+app.post("/rescheduleInterview", validateAccessToken, async (req, res) => {
+    const { _id, time } = req.body;
+    const db = getDB();
+    const collection = db.collection("accepted");
+
+    try{
+        await collection.updateOne({"_id": ObjectId(_id)}, {"$set": {"time": time}});
+    }catch(error){
+        console.log(error);
+    }
+
     return res.status(200).json({message: "success"}); 
 })
 
