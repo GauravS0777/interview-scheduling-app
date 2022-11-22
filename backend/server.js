@@ -208,6 +208,37 @@ app.post("/rescheduleInterview", validateAccessToken, async (req, res) => {
 })
 
 
+app.post("/registerUser", async (req, res) => {
+
+    const { name, username, password, isTA } = req.body;
+
+
+    const db = getDB();
+    const collection = db.collection("users");
+
+    try{
+        let user = await collection.findOne({"username": username});
+        if(user){
+            return res.status(403).json({"errorMsg": "User already exists"});
+        }
+
+        user = {
+            name, 
+            username, 
+            password,
+            isTA
+        };
+
+        await collection.insertOne(user);
+
+    }catch(error){
+        console.log(error);
+    }
+
+    return res.status(202).json({"message": "success"});
+})
+
+
 
 app.get("/getUsername", validateAccessToken, async (req, res) => {
     console.log(req.user);
