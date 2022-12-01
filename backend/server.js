@@ -67,12 +67,13 @@ app.post("/sendRequest", validateAccessToken, async (req, res) => {
     const db = getDB();
     const collection = db.collection("requests");
 
-    const { interviewerID, time } = req.body;
+    const { interviewerID, candidateID, time } = req.body;
     const { _id } = req.user;
 
     await collection.insert({
         "taID": _id,
         "interviewerID": interviewerID,
+        "candidateID": candidateID,
         "time": time
     });
 
@@ -117,7 +118,10 @@ app.get("/fetchInterviews", validateAccessToken, async (req, res) => {
 
     const db = getDB();
     const collection = db.collection("accepted");
-    const interviews = await collection.find({"interviewerID": req.user._id}).toArray();
+    const interviews = await collection.find({
+        "interviewerID": req.user._id, 
+        "time":{"$gte": new Date().toISOString()}
+    }).toArray();
     console.log(req.user._id, interviews);
     return res.status(200).json({"data": interviews});    
 })
@@ -130,7 +134,10 @@ app.get("/acceptedInterviews", validateAccessToken, async (req, res) => {
 
     const db = getDB();
     const collection = db.collection("accepted");
-    let interviews = await collection.find({"taID": req.user._id}).toArray();
+    let interviews = await collection.find({
+        "taID": req.user._id, 
+        "time":{"$gte": new Date().toISOString()}
+    }).toArray();
     interviews = await Promise.all(interviews.map(async (value) => {
         const ob = await getUserDetails(value.interviewerID);
         value.interviewerName = ob.name;

@@ -8,9 +8,11 @@ import * as React from 'react';
 import { useNavigate } from "react-router-dom";
 import LogoutBtn from "./LogoutBtn";
 import InterviewCard2 from "./InterviewCard2";
-
+import { TextField } from "@mui/material";
 
 export const TalentAcquisition = () => {
+
+    const [errorMessage, setErrorMessage] = useState("");
 
     const [value, setValue] = React.useState(dayjs('2022-11-15T10:00:00'));
     const [interviewers, setInterviewers] = useState([]);
@@ -19,6 +21,7 @@ export const TalentAcquisition = () => {
 
     const [state, updateState] = useState();
     const forceUpdate = useCallback(() => updateState({}), []);
+    const [candidateId, setCandidateId] = useState("");
 
     useEffect(() => {
         if(!localStorage.getItem("accessToken")){
@@ -78,11 +81,28 @@ export const TalentAcquisition = () => {
             Interview Scheduling App
         </Typography>
 
+        {
+            errorMessage !== "" && <Typography align="center" variant="h5" sx={{color: "red"}}>{errorMessage}</Typography>
+        }
+
         <TimeBox setValue={setValue} value={value}/>
 
+        <div
+        style={{
+            display: "flex",
+            justifyContent: "center"
+        }}
+        >
+            <TextField id="outlined-basic" label="Candidate ID" variant="outlined" 
+            sx={{"width": "100%", "maxWidth": "800px"}}
+            value={candidateId}
+            onChange = {(e) => setCandidateId(e.target.value)}
+            />
+        </div>
+        
         {
             interviewers.map((val) => {
-                return <InterviewerCard data={val} timeValue={value}/>
+                return <InterviewerCard data={val} timeValue={value} candidateId={candidateId} setErrorMessage={setErrorMessage}/>
             })
         }
 

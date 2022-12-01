@@ -16,9 +16,22 @@ export default function InterviewerCard(props) {
   const forceUpdate = useCallback(() => updateState({}), []);
 
   const sendInterviewRequest = async () => {
+    props.setErrorMessage("");
+
+    if(new Date(props.timeValue) < new Date()){
+      props.setErrorMessage("Please select a valid future time for Interview");
+      return;
+    }
+
+    if(props.candidateId == ""){
+      props.setErrorMessage("Candidate ID can't be empty");
+      return;
+    }
+
     const data = {
       "time": props.timeValue,
-      "interviewerID": props.data._id
+      "interviewerID": props.data._id,
+      "candidateID": props.candidateId
     }
 
     try{
