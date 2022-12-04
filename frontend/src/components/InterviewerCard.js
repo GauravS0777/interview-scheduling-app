@@ -45,6 +45,7 @@ export default function InterviewerCard(props) {
 
     }catch(error){
       console.log(error);
+      props.setErrorMessage(error.response.data.errorMsg)
     }
   }
 

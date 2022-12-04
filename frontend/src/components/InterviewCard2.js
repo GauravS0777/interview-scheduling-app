@@ -26,20 +26,27 @@ export default function InterviewCard2(props) {
         align="center"
         sx={{marginBottom: "20px"}}
         >
-              Interviewer: {props.data.interviewerName}
+          Interviewer: {props.data.interviewerName}
+        </Typography>
+
+        <Typography
+        align="center"
+        sx={{marginBottom: "20px"}}
+        >
+          Candidate ID: {props.data.candidateID}
         </Typography>
         
         <div
         style={{display: "flex", alignItems: "center", justifyContent: "space-around"}}
         >
 
-            <Typography>
-              Date {date?.getDate()}/{date?.getMonth() + 1}/{date?.getFullYear()}
-            </Typography>
+          <Typography>
+            Date {date?.getDate()}/{date?.getMonth() + 1}/{date?.getFullYear()}
+          </Typography>
 
-            <Typography>
-              Time {date?.getHours()}:{date?.getMinutes() < 10 ? `0${date.getMinutes()}` : date?.getMinutes()}
-            </Typography>
+          <Typography>
+            Time {date?.getHours()}:{date?.getMinutes() < 10 ? `0${date.getMinutes()}` : date?.getMinutes()}
+          </Typography>
         </div>
       </CardContent>
     </Card>

@@ -70,6 +70,28 @@ app.post("/sendRequest", validateAccessToken, async (req, res) => {
     const { interviewerID, candidateID, time } = req.body;
     const { _id } = req.user;
 
+    try{
+        const obj = await collection.findOne({"candidateID": candidateID});
+        if(obj){
+            return res.status(403).json({"errorMsg": "Interview request already sent for this candidate"});
+        }
+    }catch(error){
+        console.log(error);
+    }
+
+    const collection2 = db.collection("accepted");
+    try{
+        const obj = await collection2.findOne({
+            "candidateID": candidateID, 
+            "time":{"$gte": new Date().toISOString()}
+        });
+        if(obj){
+            return res.status(403).json({"errorMsg": "Interview already scheduled for this candidate"});
+        }
+    }catch(error){
+        console.log(error);
+    }
+
     await collection.insert({
         "taID": _id,
         "interviewerID": interviewerID,
@@ -157,7 +179,7 @@ app.post("/acceptRequest", validateAccessToken, async (req, res) => {
         return res.status(401).json({});
     }
 
-    const { _id, interviewerID, taID, time } = req.body;
+    const { _id, interviewerID, candidateID, taID, time } = req.body;
     
     const db = getDB();
     const collection = db.collection("requests");
@@ -170,7 +192,7 @@ app.post("/acceptRequest", validateAccessToken, async (req, res) => {
 
     const collection2 = db.collection("accepted");
     try{
-        await collection2.insertOne({"interviewerID": interviewerID, "taID": taID, "time": time});
+        await collection2.insertOne({"interviewerID": interviewerID, "candidateID": candidateID, "taID": taID, "time": time});
     }catch(error){
         console.log(error);
     }
